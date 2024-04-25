@@ -28,7 +28,7 @@
                 <div v-for="x in contacts" :key="x.id">
                     <div v-if="x.deletee === '1'">
                         <div class="d-flex mb-3 border border-danger-subtle rounded-3 p-2 bg-white shadow-sm">
-                            <div class="p-2"><img v-bind:src="baseURL+x.image" alt="contact" class="img-fluid rounded-circle border border-2 p-1 me-3 contact-img" :class="{ 'border-danger-subtle': x.deletee == '1' }" /></div>
+                            <div class="p-2"><img v-bind:src="baseURL+path+x.image" alt="contact" class="img-fluid rounded-circle border border-2 p-1 me-3 contact-img" :class="{ 'border-danger-subtle': x.deletee == '1' }" /></div>
                             <div class="p-2 mt-2"><span class="fs-4 text-capitalize">{{ x.fname }} {{ x.surname }}</span>
                                 <br /><span class="fs-6 text-muted lh-lg">+91 {{ x.phone }}</span></div>
                             <div class="ms-auto p-2 d-flex">
@@ -61,7 +61,7 @@
     </div>
     
     <!-- Notification Toast -->
-    <div class="toast-container position-fixed top-0 end-0 p-3 me-5 mt-2">
+    <div class="toast-container position-fixed top-0 end-0 p-3">
         <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" :class="{ 'show': showToastFlag }">
             <div class="toast-header">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bell-fill me-2" viewBox="0 0 16 16">
@@ -138,7 +138,11 @@
         data() {
             return {
                 contacts: [],
-                baseURL: 'https://lovelake.in/projects/contacts/uploads/',
+    
+                /* local image path to show image  */
+                baseURL: 'https://lovelake.in/',
+                path: 'projects/contacts/uploads/',
+    
                 // Toast notification
                 showToastFlag: false,
                 favoriteContactName: "",
@@ -156,16 +160,15 @@
         },
         methods: {
     
-            /* fetch data from database */
-            fetchData() {
-                axios.get('https://lovelake.in/projects/contacts/fetch.php')
-                    .then(response => {
-                        this.contacts = response.data;
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                        alert("Error fetching data. Please try again.");
-                    });
+            /* Fetch contact from database */
+            async fetchData() {
+                try {
+                    const response = await axios.get('https://lovelake.in/projects/contacts/fetch.php');
+                    this.contacts = response.data;
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                    alert("Error fetching data. Please try again.");
+                }
             },
     
             /* restore single contact */

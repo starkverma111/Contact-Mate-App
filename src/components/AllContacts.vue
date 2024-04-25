@@ -11,7 +11,7 @@
                 <div v-for="x in contacts" :key="x.id">
                     <div v-if="x.deletee === '0'">
                         <div class="d-flex mb-3 border rounded-3 p-2 bg-white shadow-sm">
-                            <div class="p-2"><img v-bind:src="baseURL+x.image" alt="contact" class="img-fluid rounded-circle border border-0 border-2  border-bottom border-end border-secondary-subtle p-1 me-3 contact-img" :class="{ 'border-success': x.favorite == '1' }" @click="showImage(x.id, x.fname, x.surname, x.phone, x.image)" data-bs-toggle="modal" data-bs-target="#showimg" />
+                            <div class="p-2"><img v-bind:src="baseURL+path+x.image" alt="contact" class="img-fluid rounded-circle border border-0 border-2  border-bottom border-end border-secondary-subtle p-1 me-3 contact-img" :class="{ 'border-success': x.favorite == '1' }" @click="showImage(x.id, x.fname, x.surname, x.phone, x.image)" data-bs-toggle="modal" data-bs-target="#showimg" />
                             </div>
                             <div class="p-2 mt-2"><span class="fs-4 text-capitalize">{{ x.fname }} {{ x.surname }}</span><br />
                                 <span class="fs-6 text-muted lh-lg">+91 {{ x.phone }}</span>
@@ -85,8 +85,10 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="createClose()"></button>
                 </div>
                 <div class="modal-body">
+                    <p class="my-2 text-danger text-center">{{ cmAlert }}</p>
                     <div class="row mx-3 my-3">
                         <div class="text-center py-2">
+    
                             <div v-if="createImagePreviewUrl">
                                 <img :src="createImagePreviewUrl" class="img-thumbnail rounded-4 mb-3" alt="Profile Pic" style="width: 160px; height: 160px; object-fit: cover;">
                             </div>
@@ -103,11 +105,12 @@
                         </div>
                         <div class="col p-2 m-0">
                             <label for="exampleInputEmail1" class="form-label">First name</label>
-                            <input type="text" class="form-control p-2" v-model="fname">
+                            <input type="text" class="form-control p-2" v-model="fname" @input="handleInput">
+    
                         </div>
                         <div class="col p-2 m-0">
                             <label for="exampleInputEmail1" class="form-label">Surname</label>
-                            <input type="text" class="form-control p-2" v-model="surname">
+                            <input type="text" class="form-control p-2" v-model="surname" @input="handleInput">
                         </div>
                         <div class="row p-0 m-0">
                             <div class="col p-2 m-0">
@@ -123,7 +126,8 @@
                     </div>
                 </div>
                 <div class="modal-footer mt-2 border-0">
-                    <button type="button" class="btn btn-primary" @click="createContact()" data-bs-dismiss="modal">Save Contact</button>
+                    <button type="button" class="btn btn-primary" @click="createContact()" v-if="phone == ''" data-bs-dismiss="not-close-modal">Save Contact</button>
+                    <button type="button" class="btn btn-primary" @click="createContact()" v-else data-bs-dismiss="modal">Save Contact</button>
                 </div>
             </div>
         </div>
@@ -138,11 +142,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="updateClose()"></button>
                 </div>
                 <div class="modal-body">
+                    <p class="my-2 text-danger text-center">{{ cmAlert }}</p>
                     <div class="row mx-3 my-3">
                         <div class="text-center py-2">
     
                             <!-- Show the current image -->
-                            <img :src="baseURL + uimage" v-if="!updateImagePreviewUrl" class="img-thumbnail rounded-4 mb-3" alt="Profile Pic" style="width: 160px; height: 160px; object-fit: cover;">
+                            <img :src="baseURL+path+uimage" v-if="!updateImagePreviewUrl" class="img-thumbnail rounded-4 mb-3" alt="Profile Pic" style="width: 160px; height: 160px; object-fit: cover;">
     
                             <!-- Show the newly uploaded image preview if available -->
                             <img :src="updateImagePreviewUrl" v-if="updateImagePreviewUrl" class="img-thumbnail rounded-4 mb-3" alt="Profile Pic" style="width: 160px; height: 160px; object-fit: cover;">
@@ -162,11 +167,11 @@
                         <div class="col p-2 m-0">
                             <label for="exampleInputEmail1" class="form-label">First name</label>
                             <input type="hidden" class="form-control p-2" v-model="uid">
-                            <input type="text" class="form-control p-2" v-model="ufname">
+                            <input type="text" class="form-control p-2" v-model="ufname" @input="handleInputUpdate">
                         </div>
                         <div class="col p-2 m-0">
                             <label for="exampleInputEmail1" class="form-label">Surname</label>
-                            <input type="text" class="form-control p-2" v-model="usurname">
+                            <input type="text" class="form-control p-2" v-model="usurname" @input="handleInputUpdate">
                         </div>
                         <div class="row p-0 m-0">
                             <div class="col p-2 m-0">
@@ -182,7 +187,8 @@
                     </div>
                 </div>
                 <div class="modal-footer mt-2 border-0">
-                    <button type="button" class="btn btn-primary " data-bs-dismiss="modal" aria-label="Close" @click="updateContact()">Update Contact</button>
+                    <button type="button" class="btn btn-primary " v-if="ufname== '' || uphone == ''" data-bs-dismiss="not-close-modal" aria-label="Close" @click="updateContact()">Update Contact</button>
+                    <button type="button" class="btn btn-primary " v-else data-bs-dismiss="modal" aria-label="Close" @click="updateContact()">Update Contact</button>
                 </div>
             </div>
         </div>
@@ -198,7 +204,7 @@
                 <div class="modal-body mx-3  p-2 rounded-3 mb-2  ">
                     <div class="text-center">
                         <!-- Show the current image -->
-                        <img :src="baseURL+simage" class="img-thumbnail rounded-4 mb-3 rounded-circle border border-0 border-2  border-bottom border-end border-secondary-subtle" alt="Profile Pic" style="width: 240px; height: 240px; object-fit: cover;">
+                        <img :src="baseURL+path+simage" class="img-thumbnail rounded-4 mb-3 rounded-circle border border-0 border-2 border-bottom border-end border-secondary-subtle" alt="Profile Pic" style="width: 240px; height: 240px; object-fit: cover;">
                     </div>
                     <div class="col p-2 m-0 text-center">
                         <h2 class="text-capitalize hh2 mb-2">{{ sfname +" "+ ssurname }}</h2>
@@ -217,7 +223,7 @@
     </div>
     
     <!-- Notification Toast -->
-    <div class="toast-container position-fixed top-0 end-0 p-3 me-5 mt-2">
+    <div class="toast-container position-fixed top-0 end-0 p-3">
         <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" :class="{ 'show': showToastFlag }">
             <div class="toast-header">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bell-fill me-2" viewBox="0 0 16 16">
@@ -243,17 +249,17 @@
     export default {
         data() {
             return {
-                // insert data val
+                /*  insert data val */
                 fname: '',
                 surname: '',
                 phone: '',
                 createImagePreviewUrl: null,
                 file: null,
     
-                // fetch data val
+                /* fetch data val */
                 contacts: [],
     
-                // update data val
+                /* update data val */
                 uid: '',
                 ufname: '',
                 usurname: '',
@@ -262,26 +268,31 @@
                 updateImagePreviewUrl: '',
                 updateFile: null,
     
-                // local image path to show image
-                baseURL: 'https://lovelake.in/projects/contacts/uploads/',
+                /* local image path to show image  */
+                baseURL: 'https://lovelake.in/',
+                path: 'projects/contacts/uploads/',
     
-                // Toast notification
+                /* Toast notification */
                 showToastFlag: false,
                 favoriteContactName: "",
                 NotifyMessage: "",
     
-                // Copy number val
+                /*  Copy number val */
                 textToCopy: 'Text to be copied',
     
-                // favorite border color change val
+                /* favorite border color change val  */
                 className: 'border-success',
     
-                // Show profile image on Click
+                /*  Show profile image on Click  */
                 sid: '',
                 sfname: '',
                 ssurname: '',
                 sphone: '',
                 simage: '',
+    
+                /*  input text validation  */
+                inputValue: '',
+                cmAlert: '',
             }
         },
         mounted() {
@@ -295,6 +306,7 @@
                 return this.contacts.filter(contact => contact.deletee !== '1');
             }
         },
+    
         methods: {
     
             /* For creating a contact Preview Image */
@@ -315,46 +327,54 @@
     
             /* For creating a contact send data to database with image */
             createContact() {
-                let formData = new FormData();
-                formData.append('fname', this.fname);
-                formData.append('surname', this.surname);
-                formData.append('phone', this.phone);
+                if (this.fname != '' && this.phone != '') {
+                    let formData = new FormData();
+                    formData.append('fname', this.fname);
+                    formData.append('surname', this.surname);
+                    formData.append('phone', this.phone);
     
-                // Check if a file is uploaded for creating contact
-                if (this.createFile) {
-                    formData.append('image', this.createFile); // Use createFile instead of file
+                    /* Check if a file is uploaded for creating contact  */
+                    if (this.createFile) {
+                        formData.append('image', this.createFile);
+                    }
+                    axios.post('https://lovelake.in/projects/contacts/insert.php', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }).then(response => {
+                        /*  console.log(response.data);  */
+                        if (response.data === 'Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.') {
+                            this.favoriteContactName = "Alert:";
+                            this.NotifyMessage = "Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.";
+                            this.showToast();
+                        }
+                        this.fname = '';
+                        this.surname = '';
+                        this.phone = '';
+                        this.createFile = null;
+                        this.createImagePreviewUrl = null;
+                        this.fetchData();
+                    }).catch(error => {
+                        console.error(error);
+    
+                    });
+                } else {
+    
+                    this.cmAlert = 'Name and phone required!';
+                    setTimeout(() => {
+                        this.cmAlert = '';
+                    }, 2000);
+    
                 }
-                axios.post('https://lovelake.in/projects/contacts/insert.php', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                }).then(response => {
-                    console.log(response.data);
-                    if(response.data === 'Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.'){
-                        this.favoriteContactName = "Alert:";
-                        this.NotifyMessage = "Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.";
-                        this.showToast();
-                    }
-                    this.fname = '';
-                    this.surname = '';
-                    this.phone = '';
-                    this.createFile = null; // Clear the createFile variable
-                    this.createImagePreviewUrl = null; // Clear the createImagePreviewUrl
-                    this.fetchData();
-                }).catch(error => {
-                    console.error(error);
-                    
-                    // Handle errors
-                });
             },
     
-            /* create contact cancel button / reset values */
+            /* create contact cancel button & reset values */
             createClose() {
                 this.fname = '';
                 this.surname = '';
                 this.phone = '';
-                this.createFile = null; // Clear the createFile variable
-                this.createImagePreviewUrl = null; // Clear the createImagePreviewUrl
+                this.createFile = null;
+                this.createImagePreviewUrl = null;
                 this.fetchData();
             },
     
@@ -363,8 +383,8 @@
                 this.ufname = '';
                 this.usurname = '';
                 this.uphone = '';
-                this.updateFile = null; // Clear the createFile variable
-                this.updateImagePreviewUrl = null; // Clear the createImagePreviewUrl
+                this.updateFile = null;
+                this.updateImagePreviewUrl = null;
                 this.fetchData();
             },
     
@@ -377,7 +397,7 @@
                         this.updateImagePreviewUrl = e.target.result;
                     };
                     reader.readAsDataURL(file);
-                    this.updateFile = file; // Move this line inside the 'if (file)' block
+                    this.updateFile = file;
                 } else {
                     this.updateImagePreviewUrl = null;
                     this.updateFile = null;
@@ -395,56 +415,66 @@
     
             /*  For edit & updating a contact send data to database with image */
             updateContact() {
-                // Create a FormData object
-                let formData = new FormData();
+                if (this.uid != '' && this.ufname != '' && this.uphone != '') {
     
-                // Append additional data (uid, ufname, usurname, uphone) to the FormData object
-                formData.append('uid', this.uid);
-                formData.append('ufname', this.ufname);
-                formData.append('usurname', this.usurname);
-                formData.append('uphone', this.uphone);
+                    /* Create a FormData object  */
+                    let formData = new FormData();
     
-                // Append the updated image if available
-                if (this.updateFile) {
-                    formData.append('image', this.updateFile);
+                    /* Append additional data (uid, ufname, usurname, uphone) to the FormData object  */
+                    formData.append('uid', this.uid);
+                    formData.append('ufname', this.ufname);
+                    formData.append('usurname', this.usurname);
+                    formData.append('uphone', this.uphone);
+    
+                    /*  Append the updated image if available  */
+                    if (this.updateFile) {
+                        formData.append('image', this.updateFile);
+                    }
+    
+                    axios.post('https://lovelake.in/projects/contacts/update.php', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }).then(response => {
+                        console.log(response.data);
+    
+                        /* Clear the data properties after successful upload  */
+                        if (response.data === 'Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.') {
+                            this.favoriteContactName = "Alert:";
+                            this.NotifyMessage = "Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.";
+                            this.showToast();
+                        }
+                        this.uid = '';
+                        this.ufname = '';
+                        this.usurname = '';
+                        this.uphone = '';
+                        this.updateFile = null;
+                        this.updateImagePreviewUrl = null;
+                        this.fetchData();
+                    }).catch(error => {
+                        console.error(error);
+                    });
+                } else {
+    
+                    this.cmAlert = 'Name and phone required!';
+                    setTimeout(() => {
+                        this.cmAlert = '';
+                    }, 2000);
+    
                 }
     
-                axios.post('https://lovelake.in/projects/contacts/update.php', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                }).then(response => {
-                    console.log(response.data);
-                    // Clear the data properties after successful upload
-                    if(response.data === 'Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.'){
-                        this.favoriteContactName = "Alert:";
-                        this.NotifyMessage = "Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.";
-                        this.showToast();
-                    }
-                    this.uid = '';
-                    this.ufname = '';
-                    this.usurname = '';
-                    this.uphone = '';
-                    this.updateFile = null;
-                    this.updateImagePreviewUrl = null;
-                    this.fetchData();
-                }).catch(error => {
-                    console.error(error);
-                    // Handle errors
-                });
             },
     
             /*  restrictInput input field  */
             restrictInput(event) {
-                // Remove non-numeric characters
                 let sanitizedInput = event.target.value.replace(/\D/g, '');
     
-                // Limit to 10 characters
+                /*  Limit to 10 characters  */
                 if (sanitizedInput.length > 10) {
                     sanitizedInput = sanitizedInput.slice(0, 10);
                 }
     
-                // Update the input field
+                /* Update the input field  */
                 this.phone = sanitizedInput;
             },
     
@@ -452,13 +482,12 @@
             copyToClipboard(id, fname, surname, phone) {
                 navigator.clipboard.writeText(phone)
                     .then(() => {
-                        // Success message or further action
+                        /* Success message or further action  */
                         this.favoriteContactName = fname + " " + surname;
                         this.NotifyMessage = "Contact Copied to clipboard";
                         this.showToast();
                     })
                     .catch(err => {
-                        // Error handling
                         console.error('Could not copy text: ', err);
                     });
             },
@@ -467,14 +496,13 @@
             copyToClipboardd(sfname, ssurname, sphone) {
                 navigator.clipboard.writeText(sphone)
                     .then(() => {
-                        // Success message or further action
+                        /* Success message or further action */
                         this.favoriteContactName = sfname + " " + ssurname;
                         this.NotifyMessage = "Contact Copied to clipboard";
                         this.showToast();
     
                     })
                     .catch(err => {
-                        // Error handling
                         console.error('Could not copy text: ', err);
                     });
             },
@@ -490,16 +518,15 @@
                 this.showToastFlag = false;
             },
     
-            /*  Fetch contact from database  */
-            fetchData() {
-                axios.get('https://lovelake.in/projects/contacts/fetch.php')
-                    .then(response => {
-                        this.contacts = response.data;
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                        alert("Error fetching data. Please try again.");
-                    });
+            /* Fetch contact from database */
+            async fetchData() {
+                try {
+                    const response = await axios.get('https://lovelake.in/projects/contacts/fetch.php');
+                    this.contacts = response.data;
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                    alert("Error fetching data. Please try again.");
+                }
             },
     
             /*   Make favorite code  */
@@ -509,7 +536,8 @@
                     })
                     .then(response => {
                         console.log(response.data);
-                        // Refresh data after successful operation
+    
+                        /* Refresh data after successful operation  */
                         this.fetchData();
                         this.favoriteContactName = fname + " " + surname;
                         this.NotifyMessage = "Marked as Favorite.";
@@ -528,7 +556,7 @@
                     })
                     .then(response => {
                         console.log(response.data);
-                        // Refresh data after successful operation
+                        /*  Refresh data after successful operation  */
                         this.fetchData();
                         this.favoriteContactName = fname + " " + surname;
                         this.NotifyMessage = "Marked as unfavorite.";
@@ -547,7 +575,7 @@
                     })
                     .then(response => {
                         console.log(response.data);
-                        // Refresh data after successful deletion
+                        /*  Refresh data after successful deletion  */
                         this.fetchData();
                         this.favoriteContactName = fname + " " + surname;
                         this.NotifyMessage = "Contact Deleted.";
@@ -566,11 +594,24 @@
                 this.sphone = "+91 " + phone;
                 this.simage = image;
             },
+            handleInput() {
+                /* Handle input dynamically if needed  */
+                if (this.fname.length > 9 || this.surname.length > 9) {
+                    this.fname = this.fname.substring(0, 9);
+                    this.surname = this.surname.substring(0, 9);
+                }
+            },
+            handleInputUpdate() {
+                /* Handle input dynamically if needed  */
+                if (this.ufname.length > 9 || this.usurname.length > 9) {
+                    this.ufname = this.ufname.substring(0, 9);
+                    this.usurname = this.usurname.substring(0, 9);
+                }
+            }
     
         }
     }
     </script>
     
-    <style>
-    </style>
+    <style></style>
     

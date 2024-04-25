@@ -111,6 +111,30 @@ img:hover {
     width: 50% !important;
 }
 
+@media only screen and (max-width: 1450px) {
+    .container {
+        width: 60% !important;
+    }
+}
+
+@media only screen and (max-width: 1300px) {
+    .container {
+        width: 70% !important;
+    }
+}
+
+@media only screen and (max-width: 1200px) {
+    .container {
+        width: 80% !important;
+    }
+}
+
+@media only screen and (max-width: 1100px) {
+    .container {
+        width: 90% !important;
+    }
+}
+
 @media only screen and (max-width: 960px) {
     .container {
         width: 95% !important;
