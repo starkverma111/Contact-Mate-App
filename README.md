@@ -1,24 +1,9 @@
-# contacts
+# Contacts Mate App
 
-## Project setup
-```
-npm install
-```
+> Vue js / Php
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+This is the Contact Mate app, created using Vue.js. This app allows you to easily save and manage the contact information of family and friends.
 
-### Compiles and minifies for production
-```
-npm run build
-```
+#### https://vue-contacts-app-2754a.web.app/
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+I create many other projects. Please explore them as well. All the source code for my projects is freely available for you to download and use as you please. Wishing you good luck and happy learning.
